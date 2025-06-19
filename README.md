@@ -75,3 +75,23 @@ Each model lives in its own folder, containing:
 This design lets any data scientist onboard a new model with just a few files, while reusing the same API, Docker base, CI/CD jobs, and deployment infrastructure.  
 
 
+## Scaling Strategy
+All services are deployed as Kubernetes Deployments with configurable replica counts and autoscaling policies:
+
+- **Static Replicas**: Each Deployment (gateway, modelX, monitoring) has a sensible default replica count in its Helm `values.yaml`.  
+- **Cluster Autoscaler**: On AWS EKS we run the Cluster Autoscaler so that when pods demand more nodes, the cluster automatically provisions new EC2 instances, and scales down when load subsides.  
+- **Namespace Isolation**: Each model runs in its own namespace (`inference-modelA`, etc.), preventing “noisy neighbor” interference and allowing per-model scaling policies.
+
+## Setup & Deployment Instructions
+**Model Build & Deployment Process**
+
+For each model you follow the same three-step workflow:
+
+Build the image
+Use the model’s Dockerfile (which inherits from our shared base-app) to produce a container image tagged with the desired version.
+
+Push to registry
+Authenticate to ECR (or your container registry) and push the newly built image.
+
+Deploy with Helm
+Run a Helm upgrade/install of the shared inference-service chart, passing in the model’s values.yaml and the image tag—this creates or updates the Deployment and Service for that model in Kubernetes.
