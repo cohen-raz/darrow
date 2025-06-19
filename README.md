@@ -36,7 +36,7 @@ Below is a detailed explanation of the stack and infrastructure. In the HLD you 
 
 ---
 
-## Overview – Layer 2: ML Models Repository
+## Overview – Layer 2 & 3: ML Models Repository
 
 This **mono-repo** (`ml-models`) contains all of the code and configuration needed to train, build, and serve every model in our fleet. It’s organized into two main sections:
 
